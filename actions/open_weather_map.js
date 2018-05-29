@@ -1,5 +1,5 @@
-const WEATHER_API_KEY = 'f3d9c016d38221308495414957e22e8c';
-const API_STEM = "api.openweathermap.org/data/2.5/weather?";
+import { API_STEM, WEATHER_API_KEY, STORAGE_KEY } from "../constants";
+import { AsyncStorage } from "react-native";
 
 function zipUrl(zip) {
     return `${API_STEM}q=${zip}&units=imperial&APPID=${WEATHER_API_KEY}`;
@@ -10,6 +10,14 @@ function coordsUrl(lat, lon) {
 }
 
 function fetchForecastForZip(zip) {
+    AsyncStorage.setItem(STORAGE_KEY, zip)
+        .then(() => {
+            console.log("Saved selection to disk: ", zip);
+        })
+        .catch(error => {
+            console.error("Async storage error: ", error.message)
+        })
+        .done();
     return fetch(zipUrl(zip))
         .then(response => response.json())
         .then(responseJSON => {
