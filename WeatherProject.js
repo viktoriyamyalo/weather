@@ -4,14 +4,13 @@ import {
   Text,
   View,
   TextInput,
-  Image,
-    AsyncStorage
 } from 'react-native';
 
 
 import Forecast from "./components/Forecast";
 import OpenWeatherMap from "./actions/open_weather_map";
 import LocationButton from "./components/LocationButton";
+import PhotoBackdrop from "./components/PhotoBackdrop";
 
 export default class App extends Component {
   
@@ -45,30 +44,30 @@ export default class App extends Component {
           );
       }
     return (
-      <View style={styles.container}>
-        <Image source={require('./nature.png')}
-               resizeMode='cover'
-               style={styles.backdrop}>
-            <View style={styles.overlay}>
-                <View style={styles.row}>
-                    <Text style={styles.mainText}>
-                        Current weather for
-                    </Text>
-                    <View style={styles.zipContainer}>
-                        <TextInput
-                            style={[styles.zipCode, styles.mainText]}
-                            onSubmitEditing={event => this._handleTextChange(event)}
-                            onBlur={this._handleBlur('zip')}
-                            underlineColorAndroid="transparent"
-                            keyboardType="numeric"
-                        />
-                        <LocationButton onGetCoords={OpenWeatherMap.fetchForecastForCoords}/>
+        <PhotoBackdrop>
+          <View style={styles.container}>
+                   resizeMode='cover'
+                   style={styles.backdrop}>
+                <View style={styles.overlay}>
+                    <View style={styles.row}>
+                        <Text style={styles.mainText}>
+                            Current weather for
+                        </Text>
+                        <View style={styles.zipContainer}>
+                            <TextInput
+                                style={[styles.zipCode, styles.mainText]}
+                                onSubmitEditing={event => this._handleTextChange(event)}
+                                onBlur={this._handleBlur('zip')}
+                                underlineColorAndroid="transparent"
+                                keyboardType="numeric"
+                            />
+                            <LocationButton onGetCoords={OpenWeatherMap.fetchForecastForCoords}/>
+                        </View>
                     </View>
-                </View>
-            {content}
-            </View>;
-        </Image>
-      </View>
+                {content}
+                </View>;
+            </View>
+        </PhotoBackdrop>
     );
   }
 }
