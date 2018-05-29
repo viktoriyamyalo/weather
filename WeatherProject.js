@@ -4,11 +4,12 @@ import {
   Text,
   View,
   TextInput,
-  Image
+  Image,
+    AsyncStorage
 } from 'react-native';
 
 
-import Forecast from "./Forecast";
+import Forecast from "./components/Forecast";
 import OpenWeatherMap from "./actions/open_weather_map";
 import LocationButton from "./components/LocationButton";
 
