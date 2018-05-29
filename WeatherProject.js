@@ -4,8 +4,9 @@ import {
   Text,
   View,
   TextInput,
+  AsyncStorage
 } from 'react-native';
-
+import { STORAGE_KEY } from "./constants";
 
 import Forecast from "./components/Forecast";
 import OpenWeatherMap from "./actions/open_weather_map";
@@ -16,7 +17,21 @@ export default class App extends Component {
   
   constructor(props) {
     super(props);
-    this.state = { zip: "", touched: { zip: false } forecast: null };
+    this.state = { zip: "", touched: { zip: false }, forecast: null };
+  }
+
+  componentDidMount() {
+      AsyncStorage
+          .getItem(STORAGE_KEY)
+          .then(value => {
+              if(value !== null) {
+                  OpenWeatherMap.fetchForecastForZip(value);
+              }
+          })
+          .catch(error => {
+              console.log("AsyncStorage error: " + error.message);
+          })
+          .done();
   }
 
   _handleTextChange = event => {
