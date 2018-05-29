@@ -4,70 +4,29 @@ import {
   Text,
   View,
   TextInput,
-  Image,
-  PanResponder
+  Image
 } from 'react-native';
 
 
 import Forecast from "./Forecast";
-import OpenWeatherMap from "./actions/open_weather_map";
-
-function isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function validate(field) {
-    let errors;
-    if(field.length === 0) {
-        errors[field] = 'Please enter a zipcode';
-    } else if (!isNumeric(field)) {
-        errors[field] = 'Must be a number'
-    }
-    return errors;
-}
+import fetchForecast from "./actions";
 
 export default class App extends Component {
   
   constructor(props) {
     super(props);
-    this.state = { zip: "", touched: { zip: false }, forecast: null };
-    this._panResponder = PanResponder.create({
-        onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
-        onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
-        onPanResponderGrant: this._handlePanResponderGrant,
-        onPanResponderMove: this._handlePanResponderMove,
-        onPadResponderRelease: this._handlePanResponderRelease,
-        onPanResponderTerminate: this._handlePanResponderTerminate
-    });
+    this.state = { zip: "", forecast: null };
   }
 
   _handleTextChange = event => {
     let zip = event.nativeEvent.text;
-    this.setState({zip});
-
-    OpenWeatherMap.fetchForecast(this.state.zip)
+    OpenWeatherMap.fetchForecase(zip)
         .then(forecast => {
             this.setState({forecast});
         });
   }
 
-    _handleBlur = (field) => (event) => {
-        this.setState({
-            touched: { ...this.state.touched, [field]: true },
-        });
-    }
-
-  _handleStartShouldSetPanResponder = (event, gestureState) => {
-      return true;
-  }
-
-  _handleMoveShouldSetPanResponder = (event, gestureState) => {
-      return true;
-  }
-
   render() {
-      const errors = validate(this.state.zip);
-      const isDisabled = Object.keys(errors).some(x => errors[x]); // TODO: 1. find out how this works 2. Add a button
       let content = null;
       if(this.state.forecast !== null) {
           const { main, description, temp } = this.state.forecast;
@@ -80,75 +39,42 @@ export default class App extends Component {
           );
       }
     return (
-      <View style={styles.container} {...this._panResponder.panHandlers}>
+      <View style={styles.container}>
         <Image source={require('./nature.png')}
                resizeMode='cover'
-               style={styles.backdrop}>
-            <View style={styles.overlay}>
-                <View style={styles.row}>
-                    <Text style={styles.mainText}>
-                        Current weather for
-                    </Text>
-                    <View style={styles.zipContainer}>
-                        <TextInput
-                            style={[styles.zipCode, styles.mainText]}
-                            onSubmitEditing={event => this._handleTextChange(event)}
-                            onBlur={this._handleBlur('zip')}
-                            underlineColorAndroid="transparent"
-                            keyboardType="numeric"
-                            returnKeyType="search"
-                        />
-                        {errors.zip}
-                    </View>
-                </View>
+               style={styles.backdrop}> 
+            <Text style={styles.welcome}>
+            You input {this.state.zip}
+            </Text>
             {content}
-            </View>
-        </Image>
+            <TextInput
+                style={styles.input}
+                onSubmitEditing={this._handleTextChange} />
+            </Image>
       </View>
     );
   }
 }
 
-const baseFontSize = 16;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 30
+    backgroundColor: '#666666',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  input: {
+    fontSize: 20,
+    borderWidth: 2,
+    height: 40
   },
   backdrop: {
-        flex: 1,
-        flexDirection: 'column'
-  },
-  overlay: {
-    paddingTop: 5,
-    backgroundColor: '#000000',
-    opacity: 0.5,
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  row: {
-      flexDirection: 'row',
-      flexWrap: 'nowrap',
-      alignItems: 'flex-start',
-      padding: 30
-  },
-  zipContainer: {
-      height: baseFontSize  + 10,
-      borderBottomColor: '#dddddd',
-      borderBottomWidth: 1,
-      marginLeft: 5,
-      marginTop: 3
-  },
-  zipCode: {
       flex: 1,
-      flexBasis: 1,
-      width: 50,
-      height: baseFontSize
-  },
-  mainText: {
-      fontSize: baseFontSize,
-      color: '#ffffff'
-   }
+      flexDirection: 'column'
+  }
 });
