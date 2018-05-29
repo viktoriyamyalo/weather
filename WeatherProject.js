@@ -9,21 +9,25 @@ import {
 
 
 import Forecast from "./Forecast";
-import fetchForecast from "./actions";
+import OpenWeatherMap from "./actions/open_weather_map";
 
 export default class App extends Component {
   
   constructor(props) {
     super(props);
-    this.state = { zip: "", forecast: null };
+    this.state = { zip: "", touched: { zip: false } forecast: null };
   }
 
   _handleTextChange = event => {
     let zip = event.nativeEvent.text;
-    OpenWeatherMap.fetchForecase(zip)
+    OpenWeatherMap.fetchForecast(zip)
         .then(forecast => {
             this.setState({forecast});
         });
+  }
+
+  _handleBlur = (field) => (event) => {
+      this.setState({ touched: { ...this.state.touched, [field]: true }})
   }
 
   render() {
@@ -42,39 +46,70 @@ export default class App extends Component {
       <View style={styles.container}>
         <Image source={require('./nature.png')}
                resizeMode='cover'
-               style={styles.backdrop}> 
-            <Text style={styles.welcome}>
-            You input {this.state.zip}
-            </Text>
+               style={styles.backdrop}>
+            <View style={styles.overlay}>
+                <View style={styles.row}>
+                    <Text style={styles.mainText}>
+                        Current weather for
+                    </Text>
+                    <View style={styles.zipContainer}>
+                        <TextInput
+                            style={[styles.zipCode, styles.mainText]}
+                            onSubmitEditing={event => this._handleTextChange(event)}
+                            onBlur={this._handleBlur('zip')}
+                            underlineColorAndroid="transparent"
+                            keyboardType="numeric"
+                        />
+                    </View>
+                </View>
             {content}
-            <TextInput
-                style={styles.input}
-                onSubmitEditing={this._handleTextChange} />
-            </Image>
+            </View>;
+        </Image>
       </View>
     );
   }
 }
 
+const baseFontSize = 16;
+
 const styles = StyleSheet.create({
-  container: {
+    container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#666666',
+    paddingTop: 30
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  input: {
-    fontSize: 20,
-    borderWidth: 2,
-    height: 40
-  },
-  backdrop: {
+    backdrop: {
       flex: 1,
       flexDirection: 'column'
-  }
+  },
+    overlay: {
+      paddingTop: 5,
+        backgroundColor: '#000000',
+        opacity: 0.5,
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    row: {
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      alignItems: 'flex-start',
+      padding: 30
+    },
+    zipContainer: {
+      height: baseFontSize + 10,
+      borderBottomColor: '#dddddd',
+      borderBottomWidth: 1,
+      marginLeft: 5,
+      marginTop: 3
+    },
+    zipCode: {
+      flex: 1,
+      flexBasis: 1,
+      width: 50,
+      height: baseFontSize
+    },
+    mainText: {
+      fontSize: baseFontSize,
+      color: '#ffffff'
+    }
 });
