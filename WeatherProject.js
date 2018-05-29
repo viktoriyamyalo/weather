@@ -10,6 +10,7 @@ import {
 
 import Forecast from "./Forecast";
 import OpenWeatherMap from "./actions/open_weather_map";
+import LocationButton from "./components/LocationButton";
 
 export default class App extends Component {
   
@@ -60,6 +61,7 @@ export default class App extends Component {
                             underlineColorAndroid="transparent"
                             keyboardType="numeric"
                         />
+                        <LocationButton onGetCoords={OpenWeatherMap.fetchForecastForCoords}/>
                     </View>
                 </View>
             {content}
